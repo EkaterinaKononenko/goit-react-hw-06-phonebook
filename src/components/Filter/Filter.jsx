@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { onFilter } from '../../redux/myValue/slice';
 
 export const Filter = () => {
-  const filter = useSelector(state => state.filter);
+  const filter = useSelector(state => state.contacts.filter);
   const dispatch = useDispatch();
 
   return (
