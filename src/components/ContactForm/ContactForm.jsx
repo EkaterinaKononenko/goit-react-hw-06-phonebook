@@ -2,7 +2,6 @@ import React from 'react';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { customAlphabet } from 'nanoid';
-import PropTypes from 'prop-types';
 import {
   Input,
   FormReg,
@@ -10,6 +9,8 @@ import {
   Error,
   BtnAddContact,
 } from './ContactForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/myValue/slice';
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
@@ -35,21 +36,31 @@ const schema = yup.object().shape({
 });
 
 const initualValues = {
+  id: '',
   name: '',
   number: '',
 };
 
-export const ContactForm = ({ onSubmit }) => {
-  const handleSubmit = (values, { resetForm }) => {
-    const newContact = {
-      id: nanoid(),
-      name: values.name,
-      number: values.number,
-    };
+export const ContactForm = () => {
+  const dispatch = useDispatch(); 
+  const contacts = useSelector(state => state.contacts.contacts)
 
-    onSubmit(newContact);
-    resetForm();
-  };
+        const handleSubmit = (values, { resetForm }) => {
+          const newContact = {
+            id: 'id-' + nanoid(),
+            name: values.name,
+            number: values.number,
+          };
+
+          if (contacts.some(contact => contact.name === newContact.name)) {
+            return alert(
+              `Contact ${newContact.name} has already been registrated.`
+            );
+          }
+          dispatch(addContact(newContact));
+          resetForm();
+        };
+
   return (
     <Formik
       initialValues={initualValues}
@@ -59,12 +70,13 @@ export const ContactForm = ({ onSubmit }) => {
       <FormReg autoComplete="off">
         <LabelForm htmlFor="name">
           Name
-          <Input type="text" name="name" />
+          <Input type="text" name="name" id="name"/>
           <Error name="name" component="div" />
         </LabelForm>
         <LabelForm htmlFor="number">
           Number
           <Input
+            id="number"
             type="tel"
             name="number"
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
@@ -78,6 +90,3 @@ export const ContactForm = ({ onSubmit }) => {
   );
 };
 
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};

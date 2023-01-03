@@ -2,20 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Contact } from '../Contact/Contact';
 import { ContactListWrap } from './ContactList.styled';
+import { useSelector} from 'react-redux';
 
-export const ContactList = ({ contacts, deleteContact }) => {
+
+
+export const ContactList = () => {
+  const contacts = useSelector(state => state.contacts.contacts);
+  const filter = useSelector(state => state.filter);
+
+ const filteredContacts = filter
+    ? contacts.filter(({ name }) =>
+        name.toLowerCase().includes(filter.toLowerCase().trim())
+      )
+    : contacts;
+  
   return (
     <ContactListWrap>
-      {contacts.map(({ id, name, number }) => {
-        return (
-          <Contact
-            key={id}
-            id={id}
-            name={name}
-            number={number}
-            onDelete={deleteContact}
-          />
-        );
+      {filteredContacts.map(({ id, name, number }) => {
+        return <Contact key={id} id={id} name={name} number={number} />;
       })}
     </ContactListWrap>
   );
@@ -29,5 +33,4 @@ ContactList.propTypes = {
       number: PropTypes.string.isRequired,
     })
   ),
-  deleteContact: PropTypes.func.isRequired,
 };
